@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getTodos } from "./apis/queries";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getTodos, createTodos } from "./apis/queries";
 import { Box, Container, Stack, TextField, Typography } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
@@ -11,8 +11,15 @@ import CheckIcon from '@mui/icons-material/Check';
 const App = () => {
   const [addTask, setAddTask] = useState('')
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["todos"],
+    queryKey: ["getTodos"],
     queryFn: getTodos,
+  });
+  const { mutate, isPending, error: createTodoError} = useMutation({
+    mutationKey: ["createTodos"],
+    mutationFn: createTodos,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getTodos"] });
+    },
   });
 
   if (isLoading) return <p>Loading todos...</p>;
@@ -22,9 +29,16 @@ const App = () => {
     setAddTask(value);
   }
 
-  function handleClick(e,todo){
-    console.log("Radio : ",{value : e.target.value, todo})
+  function handleSave(addTask) {
+    console.log("New Todo : ", addTask);
+    mutate(addTask);
+    setAddTask('');
   }
+
+  function handleClick(e, todo) {
+    console.log("Radio : ", { value: e.target.value, todo: todo.completed, todoId: todo.id })
+  }
+
   return (
     <Box sx={{ minHeight: "50vh", }}>
       {/* TOP GRADIENT */}
@@ -51,7 +65,7 @@ const App = () => {
                 fontWeight: 700,
               }}
             >
-              TODO
+              {/* TODO */}
             </Typography>
 
             <Typography sx={{ fontSize: 22 }}>
@@ -72,7 +86,7 @@ const App = () => {
             overflow: "hidden",
           }}
         >
-          <Box sx={{display : 'flex', justifyContent : 'space-between'}}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             {/* INPUT */}
             <TextField
               variant="standard"
@@ -92,7 +106,7 @@ const App = () => {
             >
               {addTask}
             </TextField>
-            {addTask && <CheckIcon  sx={{ p : 3.5}}/>}
+            {addTask && <CheckIcon sx={{ p: 3.5, cursor: "pointer" }} onClick={() => handleSave(addTask)} />}
 
           </Box>
 
@@ -111,7 +125,7 @@ const App = () => {
             >
               <Checkbox
                 checked={todo.completed}
-                onClick={(e)=>handleClick(e,todo)}
+                onClick={(e) => handleClick(e, todo)}
                 icon={
                   <RadioButtonUncheckedIcon
                     sx={{ color: "rgba(255,255,255,0.3)" }}

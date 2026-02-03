@@ -14,10 +14,11 @@ This project demonstrates backend APIs, efficient frontend data fetching, and a 
 - Responsive UI built with Material UI
 - Proper loading and error handling
 
-
-
 ## 🛠️ Tech Stack
 
 **Client:**  React, TanStack Query, Material UI (MUI), Axios, JavaScript (ES6+)
 
 **Server:** Node.js, Express.js, PostgreSQL, REST API
+
+## Screenshot 
+![Taskify UI](react/src/assets/Taskify-ui.png)
